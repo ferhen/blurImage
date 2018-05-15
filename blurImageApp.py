@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 
 import blurImage
-import tkinter as tk
 import os
-from tkinter import filedialog
-from tkinter import ttk
+try:
+    import tkinter as tk
+    from tkinter import filedialog
+    from tkinter import ttk
+except ImportError:
+    import Tkinter as tk
+    import ttk
+    import Filedialog as filedialog
 from PIL import ImageTk, Image
 import threading
 from queue import Queue
@@ -32,7 +37,7 @@ class MainApplication(tk.Tk):
         self.queue_frame = Processing(self)
         self.queue_frame.grid(row=1, column=0, sticky="nsew")
 
-        #~ self.imageScreenFrame.tkraise() # put imageScreenFrame Frame on top
+        self.imageScreenFrame.tkraise() # put imageScreenFrame Frame on top
 
 
 class BlurryImage(tk.Label):
