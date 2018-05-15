@@ -4,6 +4,7 @@ import blurImage
 import tkinter as tk
 import os
 from tkinter import filedialog
+from tkinter import ttk
 from PIL import ImageTk, Image
 import threading
 from queue import Queue
@@ -31,7 +32,7 @@ class MainApplication(tk.Tk):
         self.queue_frame = Processing(self)
         self.queue_frame.grid(row=1, column=0, sticky="nsew")
 
-        self.imageScreenFrame.tkraise() # put imageScreenFrame Frame on top
+        #~ self.imageScreenFrame.tkraise() # put imageScreenFrame Frame on top
 
 
 class BlurryImage(tk.Label):
@@ -122,23 +123,28 @@ class SaveBlurredImageScreen(tk.Frame):
 
 class Processing(tk.Frame):
     def __init__(self, master=None, **kwargs):
-        tk.Frame.__init__(self, master, bg='green', **kwargs)
+        tk.Frame.__init__(self, master, **kwargs)
 
+        self.pb = tk.IntVar()
+        pb = ttk.Progressbar(self, variable=self.pb, length=200)
+        pb.pack()
         self.label = tk.Label(self)
         self.label.pack()
         self.status = ''
 
     def start(self):
         self.status = ''
+        self.pb.set(0)
         self.update()
 
     def update(self):
         while not self.master.queue.empty():
             self.status = self.master.queue.get()
-        self.label.config(text=self.status)
         if self.status == "Done":
             self.master.saveBlurredImageScreenFrame.tkraise()
         else:
+            self.label.config(text=self.status)
+            self.pb.set(self.status[-3:-1])
             self.after(100, self.update)
 
 if __name__ == "__main__":
