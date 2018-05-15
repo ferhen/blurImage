@@ -14,6 +14,13 @@ from PIL import ImageTk, Image
 import threading
 from queue import Queue
 
+FILETYPES = (
+    ("Image files",("*.jpeg", "*.jpg", "*.png")),
+    ("jpeg files","*.jpeg"),
+    ("jpg files","*.jpg"),
+    ("png files","*.png"),
+    ("all files","*.*"))
+
 class MainApplication(tk.Tk):
     def __init__(self, master=None, **kwargs):
         tk.Tk.__init__(self, master, **kwargs)
@@ -81,7 +88,7 @@ class SelectImageScreen(tk.Frame):
         self.selectImageButton.grid(row=1, column=1, pady=50)
 
     def selectImage(self):
-        filename =  filedialog.askopenfilename(initialdir = os.getcwd(), title = "Select file", filetypes = (("jpeg files","*.jpeg"),("jpg files","*.jpg"),("png files","*.png"),("all files","*.*")))
+        filename = filedialog.askopenfilename(initialdir = os.getcwd(), title = "Select file", filetypes = FILETYPES)
         if filename:
             self.master.image.load_image(filename)
             self.arrangeUIElements()
@@ -119,7 +126,7 @@ class SaveBlurredImageScreen(tk.Frame):
         self.cancelButton.grid(row=1, column=1, padx=20, pady=20)
 
     def saveImage(self):
-        filename = filedialog.asksaveasfilename(initialdir = os.getcwd(), title = "Select file", filetypes = (("jpeg files","*.jpeg"),("jpg files","*.jpg"),("png files","*.png"),("all files","*.*")))
+        filename = filedialog.asksaveasfilename(initialdir = os.getcwd(), title = "Select file", filetypes = FILETYPES)
         if filename:
             self.master.image.save_blurred(filename)
 
