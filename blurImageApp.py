@@ -5,6 +5,8 @@ import tkinter as tk
 import os
 from tkinter import filedialog
 from PIL import ImageTk, Image
+import threading
+from queue import Queue
 
 class MainApplication(tk.Tk):
     def __init__(self, master=None, **kwargs):
@@ -14,15 +16,20 @@ class MainApplication(tk.Tk):
     def init_window(self):
         self.title("Image blurring application" )
 
+        self.queue = Queue()
+
         self.image = BlurryImage(self)
         self.image.grid(padx=50, pady=50)
 
-        # the next 2 Frames overlap each other (same grid spot)
+        # the next 3 Frames overlap each other (same grid spot)
         self.imageScreenFrame = SelectImageScreen(self)
-        self.imageScreenFrame.grid(row=1, column=0, sticky="nsew", padx=50, pady=(65,0))
+        self.imageScreenFrame.grid(row=1, column=0, sticky="nsew")
 
         self.saveBlurredImageScreenFrame = SaveBlurredImageScreen(self)
-        self.saveBlurredImageScreenFrame.grid(row=1, column=0, sticky="nsew", padx=50, pady=(40, 0))
+        self.saveBlurredImageScreenFrame.grid(row=1, column=0, sticky="nsew")
+
+        self.queue_frame = Processing(self)
+        self.queue_frame.grid(row=1, column=0, sticky="nsew")
 
         self.imageScreenFrame.tkraise() # put imageScreenFrame Frame on top
 
@@ -35,9 +42,12 @@ class BlurryImage(tk.Label):
         self.tkImageObject = ImageTk.PhotoImage(self.imageObject)
         self.config(image=self.tkImageObject)
 
-    def blur_image(self, blur_level):
+    def blur_image(self, *args):
         '''blur the current image and display the blurred version'''
-        self.blurriedImage = blurImage.blurryPhoto(self.imageObject, blur_level)
+        self.blurriedImage = blurImage.blurryPhoto(self.imageObject, *args)
+        self.after(10, self.update_image)
+
+    def update_image(self):
         self.blurriedtkImageObject = ImageTk.PhotoImage(self.blurriedImage)
         self.config(image=self.blurriedtkImageObject)
 
@@ -79,8 +89,11 @@ class SelectImageScreen(tk.Frame):
         self.blurScale.grid(row=1, column=2, padx=20, pady=20)
 
     def blurImage(self):
-        self.master.image.blur_image(self.blurScale.get())
-        self.master.saveBlurredImageScreenFrame.tkraise()
+        args = self.blurScale.get(), self.master.queue
+        t = threading.Thread(target=self.master.image.blur_image, args=args)
+        t.start()
+        self.master.queue_frame.start() # start monitoring the queue
+        self.master.queue_frame.tkraise()
 
 
 class SaveBlurredImageScreen(tk.Frame):
@@ -106,6 +119,27 @@ class SaveBlurredImageScreen(tk.Frame):
 
     def cancelButton(self):
         self.master.imageScreenFrame.tkraise()
+
+class Processing(tk.Frame):
+    def __init__(self, master=None, **kwargs):
+        tk.Frame.__init__(self, master, bg='green', **kwargs)
+
+        self.label = tk.Label(self)
+        self.label.pack()
+        self.status = ''
+
+    def start(self):
+        self.status = ''
+        self.update()
+
+    def update(self):
+        while not self.master.queue.empty():
+            self.status = self.master.queue.get()
+        self.label.config(text=self.status)
+        if self.status == "Done":
+            self.master.saveBlurredImageScreenFrame.tkraise()
+        else:
+            self.after(100, self.update)
 
 if __name__ == "__main__":
     application = MainApplication()
