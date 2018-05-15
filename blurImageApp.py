@@ -1,13 +1,14 @@
+#!/usr/bin/env python3
+
 import blurImage
 import tkinter as tk
 import os
 from tkinter import filedialog
 from PIL import ImageTk, Image
 
-class mainApplication(tk.Tk):
-
-    def __init__(self, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
+class MainApplication(tk.Tk):
+    def __init__(self, master=None, **kwargs):
+        tk.Tk.__init__(self, master, **kwargs)
         self.init_window()
 
     def init_window(self):
@@ -23,13 +24,13 @@ class mainApplication(tk.Tk):
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
         self.init_selectImageScreen()
-    
+
     def init_selectImageScreen(self):
-        self.imageScreenFrame = selectImageScreen(parent=self.container, controller=self)
+        self.imageScreenFrame = SelectImageScreen(parent=self.container, controller=self)
         self.imageScreenFrame.grid(row=0, column=0, sticky="nsew")
 
     def init_saveBlurredImageScreen(self):
-        self.saveBlurredImageScreenFrame = saveBlurredImageScreen(parent=self.container, controller=self)
+        self.saveBlurredImageScreenFrame = SaveBlurredImageScreen(parent=self.container, controller=self)
         self.saveBlurredImageScreenFrame.grid(row=0, column=0, sticky="nsew")
         self.geometry('%dx%d' % (self.imageObject.size[0] + 100, self.imageObject.size[1] + 80))
 
@@ -37,7 +38,7 @@ class mainApplication(tk.Tk):
         self.saveBlurredImageScreenFrame.destroy()
         self.geometry('%dx%d' % (self.imageObject.size[0] + 100, self.imageObject.size[1] + 130))
 
-class selectImageScreen(tk.Frame):
+class SelectImageScreen(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -56,7 +57,7 @@ class selectImageScreen(tk.Frame):
         self.blurScaleLabel = tk.Label(self.scaleFrame, text="Blur Factor:")
         self.buttonFrame.pack(side="bottom")
         self.selectImageButton.grid(row=1, column=1, pady=50)
-        
+
     def selectImage(self):
         self.imageDirectory =  filedialog.askopenfilename(initialdir = os.getcwd(), title = "Select file", filetypes = (("jpeg files","*.jpeg"),("jpg files","*.jpg"),("png files","*.png"),("all files","*.*")))
         if(self.imageDirectory):
@@ -87,12 +88,12 @@ class selectImageScreen(tk.Frame):
         self.blurScaleLabel.grid(row=1, column=1)
         self.blurScale.grid(row=1, column=2, padx=20, pady=20)
 
-    def blurImage(self):      
+    def blurImage(self):
         self.controller.blurriedImage = blurImage.blurryPhoto(self.controller.imageObject, self.blurScale.get())
         self.controller.init_saveBlurredImageScreen()
 
-class saveBlurredImageScreen(tk.Frame):
-    
+class SaveBlurredImageScreen(tk.Frame):
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -123,5 +124,5 @@ class saveBlurredImageScreen(tk.Frame):
         self.controller.end_selectImageScreensaveBlurredImageScreen()
 
 if __name__ == "__main__":
-    application = mainApplication()
+    application = MainApplication()
     application.mainloop()
