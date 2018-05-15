@@ -73,8 +73,8 @@ class SelectImageScreen(tk.Frame):
     def init_window(self):
         self.buttonFrame = tk.Frame(self)
         self.scaleFrame = tk.Frame(self)
-        self.selectImageButton = tk.Button(self.buttonFrame, text="Select Image", command=self.selectImage)
-        self.blurButton = tk.Button(self.buttonFrame, text="Blur Image", command=self.blurImage)
+        self.selectImageButton = ttk.Button(self.buttonFrame, text="Select Image", command=self.selectImage)
+        self.blurButton = ttk.Button(self.buttonFrame, text="Blur Image", command=self.blurImage)
         self.blurScale = tk.Scale(self.scaleFrame, from_=1, to=10, orient="horizontal")
         self.blurScaleLabel = tk.Label(self.scaleFrame, text="Blur Factor:")
         self.buttonFrame.pack(side="bottom")
@@ -109,8 +109,8 @@ class SaveBlurredImageScreen(tk.Frame):
 
     def init_window(self):
         self.buttonFrame = tk.Frame(self)
-        self.saveImageButton = tk.Button(self.buttonFrame, text="Save Image", command=self.saveImage)
-        self.cancelButton = tk.Button(self.buttonFrame, text="Cancel", command=self.cancelButton)
+        self.saveImageButton = ttk.Button(self.buttonFrame, text="Save Image", command=self.saveImage)
+        self.cancelButton = ttk.Button(self.buttonFrame, text="Cancel", command=self.cancelButton)
         self.arrangeUIElements()
 
     def arrangeUIElements(self):
