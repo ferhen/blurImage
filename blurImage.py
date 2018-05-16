@@ -1,3 +1,5 @@
+
+from __future__ import division
 from PIL import Image
 
 def getDimensionFromBlurryFactor(blurryFactor):
@@ -8,7 +10,7 @@ def getDimensionFromBlurryFactor(blurryFactor):
         else:
                 return getDimensionFromBlurryFactor(blurryFactor - 1) + 2
 
-def blurryPhoto(foto, blurryFactor):
+def blurryPhoto(foto, blurryFactor, queue=None):
         fotoCopy = foto.copy()
         fotoLoad = fotoCopy.load()
         kernelSize = getDimensionFromBlurryFactor(blurryFactor)
@@ -29,9 +31,14 @@ def blurryPhoto(foto, blurryFactor):
                         greenKernelAverage = int(greenKernelColorSum / count)
                         blueKernelAverage = int(blueKernelColorSum / count)
                         fotoLoad[i,j] = (redKernelAverage, greenKernelAverage, blueKernelAverage)
-                print("Calculating: ", int(i/fotoCopy.size[0]*100), "%" )
+
+                status = "Calculating: {}%".format(int(i/fotoCopy.size[0]*100))
+                print(status)
+                if queue:
+                    queue.put(status)
+        queue.put("Done")
         return fotoCopy
-   
+
 if __name__ == "__main__":
         blurryFactor = int(input('Insert blurr factor: '))
         print("Calculating...")
