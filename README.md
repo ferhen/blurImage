@@ -1,2 +1,2 @@
-# Image-blurring-application
+# blurImage
 Image blurring desktop application made with TkInter and PIL
